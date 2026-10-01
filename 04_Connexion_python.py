@@ -8,6 +8,21 @@ Created on Thu Oct  1 23:55:16 2026
 import pandas as pd
 import sqlalchemy 
 import time
+import os
+from dotenv import load_dotenv
+
+
+# Charge le contenu du fichier .env
+load_dotenv()
+
+# Récupère les variables de manière sécurisée
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+
+
 
 def mesurer_temps(fonction):
     def wrapper(*args,**kwargs):
@@ -54,9 +69,10 @@ def recuperer_top_commandes(db_url:str)->pd.DataFrame:
     return df_top_commandes
 
 
+# Construit l'URL dynamiquement
+db_url = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-
-df_resultat=recuperer_top_commandes("postgresql+psycopg2://postgres:Admin1456@localhost:5432/northwind")
+df_resultat=recuperer_top_commandes(db_url)
 
 print("\n--- Aperçu des résultats ---")
 print(df_resultat.head(10))
