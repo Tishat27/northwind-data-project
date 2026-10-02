@@ -101,7 +101,7 @@ class NorthwindtopOrder :
         
         
     @mesurer_temps
-    def recuperer_top_commandes(self) -> pd.DataFrame:
+    def recuperer_top_commandes_poo(self) -> pd.DataFrame:
         # 1 Définnir la reqête
         requete_sql = """WITH best_order AS(
           SELECT e.employee_id,o.order_id, e.last_name, e.first_name, 
@@ -136,7 +136,7 @@ class NorthwindtopOrder :
 Order=NorthwindtopOrder()
 
 
-df_resultat = Order.recuperer_top_commandes()
+df_resultat = Order.recuperer_top_commandes_poo()
 
 print("\n--- Aperçu des résultats ---")
 print(df_resultat.head(10))
