@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
 """
 Created on Thu Oct  1 23:55:16 2026
 
 @author: Tishat27
 """
 
-import pandas as pd
-import sqlalchemy 
-import time
 import os
-from dotenv import load_dotenv
+import time
 
+import pandas as pd
+import sqlalchemy
+from dotenv import load_dotenv
 
 # Charge le contenu du fichier .env
 load_dotenv()
@@ -23,23 +22,22 @@ DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
 
 
-
 def mesurer_temps(fonction):
-    def wrapper(*args,**kwargs):
-        debut=time.time()
-        resultat=fonction(*args,**kwargs)
-        fin=time.time()
-        delai=fin-debut
-        print (f"Le délai d'exécution est de {delai:.4f} secondes.")
-        return (resultat)
+    def wrapper(*args, **kwargs):
+        debut = time.time()
+        resultat = fonction(*args, **kwargs)
+        fin = time.time()
+        delai = fin - debut
+        print(f"Le délai d'exécution est de {delai:.4f} secondes.")
+        return resultat
+
     return wrapper
 
 
-
 @mesurer_temps
-def recuperer_top_commandes(db_url:str)->pd.DataFrame:
-   #1 Définnir la reqête
-    requete_sql="""WITH best_order AS(
+def recuperer_top_commandes(db_url: str) -> pd.DataFrame:
+    # 1 Définnir la reqête
+    requete_sql = """WITH best_order AS(
       SELECT e.employee_id,o.order_id, e.last_name, e.first_name, 
       ROUND(SUM(od.unit_price*(1-od.discount)*od.quantity)::numeric, 2) AS order_value
      
@@ -58,21 +56,21 @@ def recuperer_top_commandes(db_url:str)->pd.DataFrame:
        FROM rank_data rd
        WHERE order_rank<=2
        ORDER BY rd.employee_id,order_rank;"""
-       
-       #2 Crééer la connexion avec l'URL de connexion
+
+    # 2 Crééer la connexion avec l'URL de connexion
     engine = sqlalchemy.create_engine(db_url)
-       
-       #3 Charger le résultat dans pandas
+
+    # 3 Charger le résultat dans pandas
     df_top_commandes = pd.read_sql(requete_sql, con=engine)
-       
-       #afficher les résultats
+
+    # afficher les résultats
     return df_top_commandes
 
 
 # Construit l'URL dynamiquement
 db_url = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-df_resultat=recuperer_top_commandes(db_url)
+df_resultat = recuperer_top_commandes(db_url)
 
 print("\n--- Aperçu des résultats ---")
 print(df_resultat.head(10))
